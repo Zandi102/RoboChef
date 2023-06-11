@@ -10,13 +10,13 @@ import SwiftUI
 struct Home: View {
     
     @State var items : [String] = [
-        "hi", "hello", "hello"
+        "tostidos pizza rolls", "hello", "hello"
     ]
     
     var addButton: some View {
         Button("Add", action: {
             addItem()
-        })
+        }).frame(width: 100, height: 100, alignment: .trailing)
     }
     
     func delete(indexSet: IndexSet) {
@@ -32,34 +32,60 @@ struct Home: View {
     }
     
     var body : some View {
-        ZStack {
-            NavigationView {
-                List {
-                    Section(
-                        header:
-                            HStack {
-                                Text("Items")
-                                Image(systemName: "cart.fill")
+            ZStack {
+                NavigationView {
+                    VStack {
+                        List {
+                            Section(
+                                header:
+                                    HStack {
+                                        Image(systemName: "cart.fill")
+                                    }
+                                    .font(.body)
+                                    .foregroundColor(Color("color2"))
+                                )
+                            {
+                                ForEach(items, id: \.self) { item in
+                                    HStack {
+                                        Ellipse().frame(width: 5, height: 5)
+                                            .foregroundColor(Color("color3"))
+                                        Text(item)
+                                    }
+                                }
+                                .onDelete(perform: self.delete)
+                                .onMove(perform: move)
                             }
-                            .font(.body)
-                            .foregroundColor(Color("color2"))
-                        ){
-                        ForEach(items, id: \.self) { item in
-                            Text(item)
+                            Section(
+                                header:
+                                    HStack {
+                                        Image(systemName: "book.fill")
+                                    }
+                                    .font(.body)
+                                    .foregroundColor(Color("color2"))
+                                )
+                            {
+                                ForEach(items, id: \.self) { item in
+                                    HStack {
+                                        Ellipse().frame(width: 5, height: 5)
+                                            .foregroundColor(Color("color3"))
+                                        Text("pantryITem")
+                                    }
+                                }
+                                .onDelete(perform: self.delete)
+                                .onMove(perform: move)
+                            }
                         }
-                        .onDelete(perform: self.delete)
-                        .onMove(perform: move)
-                    }
+                        .navigationTitle("Items")
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                EditButton()
+                            }
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                addButton
+                            }
+                        }.accentColor(Color("color3"))
+                    
                 }
-                .navigationTitle("My Shopping List")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        EditButton()
-                    }
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        addButton
-                    }
-                }.accentColor(Color("color3"))
             }
         }
     }
