@@ -87,3 +87,15 @@ struct CustomButton : View{
             
     }
 }
+
+struct CustomAlertView: View {
+    @Binding var item: String
+
+    var body: some View {
+        VStack {
+            TextField("Item", text: $item)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
+        }
+    }
+}
