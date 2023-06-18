@@ -6,11 +6,57 @@
 //
 
 import SwiftUI
+import UIKit
+
 
 struct Login: View {
     @State private var username: String = ""
     @State private var password: String = ""
+    @State private var isLoginSuccessful = false
+    @State private var showError = false
     @State var isLinkActive = false
+    
+    func login() -> Bool {
+        let url = URL(string: "http://localhost:7078/auth/login")!
+        var request = URLRequest(url: url)
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpMethod = "POST"
+        let parameters: [String: Any] = [
+            "username": username,
+            "password": password
+        ]
+        request.httpBody = parameters.percentEncoded()
+
+        var loginSuccessful = false
+
+        let semaphore = DispatchSemaphore(value: 0)
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard
+                let response = response as? HTTPURLResponse,
+                error == nil
+            else {                                                               // check for fundamental networking error
+                print("error", error ?? URLError(.badServerResponse))
+                semaphore.signal()
+                return
+            }
+
+            if response.statusCode == 200 {
+                loginSuccessful = true
+            }
+
+            semaphore.signal()
+        }
+
+        task.resume()
+
+        _ = semaphore.wait(timeout: .distantFuture)
+
+        return loginSuccessful
+    }
+
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -59,14 +105,26 @@ struct Login: View {
                             }
                             
                             VStack(alignment: .trailing) {
-                                Button(action: {}, label: {
+                                Button(action: {
+                                    //add forgot password functionality
+                                }, label: {
                                     Text("Forgot Password?")
                                         .fontWeight(.bold).padding(.bottom, 20)
                                         .font(.system(size: 18))
                                         .foregroundColor(.black)
                                 })
                                 
-                                Button(action: {}, label: {
+                                Button(action: {
+                                    if(login()) {
+                                        username = ""
+                                        password = ""
+                                        showError = false
+                                        isLoginSuccessful = true
+                                    }
+                                    else {
+                                        showError = true;
+                                    }
+                                }, label: {
                                     CustomButton(title: "Sign In", bgColor: "color3");
                                 })
                             }.padding(.horizontal, 20)
@@ -118,7 +176,13 @@ struct Login: View {
                     }
                 }
             }
-        }
+        }.background(
+            NavigationLink(
+                destination: HomeView(),
+                isActive: $isLoginSuccessful,
+                label: { EmptyView() }
+            )
+        )
     }
 }
 
@@ -126,6 +190,29 @@ struct Login_Previews: PreviewProvider {
     static var previews: some View {
         Login()
     }
+}
+
+extension Dictionary {
+    func percentEncoded() -> Data? {
+        map { key, value in
+            let escapedKey = "\(key)".addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) ?? ""
+            let escapedValue = "\(value)".addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) ?? ""
+            return escapedKey + "=" + escapedValue
+        }
+        .joined(separator: "&")
+        .data(using: .utf8)
+    }
+}
+
+extension CharacterSet {
+    static let urlQueryValueAllowed: CharacterSet = {
+        let generalDelimitersToEncode = ":#[]@" // does not include "?" or "/" due to RFC 3986 - Section 3.4
+        let subDelimitersToEncode = "!$&'()*+,;="
+        
+        var allowed: CharacterSet = .urlQueryAllowed
+        allowed.remove(charactersIn: "\(generalDelimitersToEncode)\(subDelimitersToEncode)")
+        return allowed
+    }()
 }
 //
 //extension UINavigationController {

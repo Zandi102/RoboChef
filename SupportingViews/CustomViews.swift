@@ -35,7 +35,7 @@ struct CustomTextField: View {
                 .padding(.leading, 20)
                 .foregroundColor(Color(bColor).opacity(tOpacity));
             
-            if (placeHolder == "password") {
+            if (placeHolder == "Password") {
                 ZStack (alignment: .leading) {
                     if(value.isEmpty) {
                         Text(placeHolder)
@@ -56,13 +56,12 @@ struct CustomTextField: View {
                             .foregroundColor(Color(bColor).opacity(tOpacity))
                             .padding(.leading, 12)
                             .font(.system(size: 20))
-                        
+                    }
                         TextField("", text: $value)
                             .padding(.leading, 12)
                             .font(.system(size: 20))
                             .frame(height: 45 )
                             .foregroundColor(Color(bColor))
-                    }
                 }
             }
         }

@@ -66,7 +66,7 @@ struct GroceryView: View {
                                     secondaryAction: {
                                         print("cancelled")
                                     }
-                                }
+                                }.foregroundColor(Color("color3"))
                             }
                     ) {
                         ForEach(items, id: \.self) { item in
@@ -81,6 +81,7 @@ struct GroceryView: View {
                         .onMove(perform: moveGroceryItem)
                     }
                     .listStyle(.plain)
+                    .accentColor(Color("color3"))
 
                     Section(
                         header:
@@ -99,7 +100,7 @@ struct GroceryView: View {
                                     secondaryAction: {
                                         print("cancelled")
                                     }
-                                }
+                                }.foregroundColor(Color("color3"))
                             }
                     ) {
                         ForEach(pantryItems, id: \.self) { item in
@@ -114,10 +115,11 @@ struct GroceryView: View {
                         .onMove(perform: movePantryItem)
                     }
                     .listStyle(.plain)
+                    .accentColor(Color("color3"))
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        EditButton()
+                        EditButton().accentColor(Color("color3"))
                     }
                 }
             }
